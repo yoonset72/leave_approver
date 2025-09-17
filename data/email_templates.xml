@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Email template for first approval notification -->
+    <record id="email_template_first_approval" model="mail.template">
+        <field name="name">Leave Request - First Approval Required</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="subject">Leave Request Approval Required - ${object.employee_id.name}</field>
+        <field name="email_to">${object.first_approver_id.email or ''}</field>
+        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Dear ${object.first_approver_id.name},</p>
+                <p>A leave request has been submitted and requires your approval:</p>
+                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Employee:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Reason:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.name or 'N/A'}</td>
+                    </tr>
+                </table>
+                <p>Please review and take appropriate action on this request.</p>
+                <p>
+                    <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id" 
+                       style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                        Review Leave Request
+                    </a>
+                </p>
+                <p>Best regards,<br/>HR Management System</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Email template for second approval notification -->
+    <record id="email_template_second_approval" model="mail.template">
+        <field name="name">Leave Request - Second Approval Required</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="subject">Leave Request - Final Approval Required - ${object.employee_id.name}</field>
+        <field name="email_to">${ctx.get('email_to', '')}</field>
+        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Dear HR Officer,</p>
+                <p>A leave request has been approved by the first level approver and now requires final approval:</p>
+                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Employee:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Department:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.department_id.name or 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>First Approved By:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.first_approver_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Reason:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.name or 'N/A'}</td>
+                    </tr>
+                </table>
+                <p>Please review and provide final approval for this leave request.</p>
+                <p>
+                    <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id" 
+                       style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                        Review Leave Request
+                    </a>
+                </p>
+                <p>Best regards,<br/>HR Management System</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Email template for final approval notification to employee -->
+    <record id="email_template_final_approval" model="mail.template">
+        <field name="name">Leave Request - Approved</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="subject">Leave Request Approved - ${object.holiday_status_id.name}</field>
+        <field name="email_to">${object.employee_id.work_email or object.employee_id.personal_email}</field>
+        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Dear ${object.employee_id.name},</p>
+                <p style="color: #4CAF50; font-weight: bold;">Your leave request has been approved!</p>
+                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
+                    </tr>
+                </table>
+                <p>Your leave has been fully approved and is now confirmed in the system.</p>
+                <p>Best regards,<br/>HR Department</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Email template for refusal notification -->
+    <record id="email_template_refusal" model="mail.template">
+        <field name="name">Leave Request - Refused</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="subject">Leave Request Refused - ${object.holiday_status_id.name}</field>
+        <field name="email_to">${object.employee_id.work_email or object.employee_id.personal_email}</field>
+        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Dear ${object.employee_id.name},</p>
+                <p style="color: #f44336; font-weight: bold;">Your leave request has been refused.</p>
+                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
+                    </tr>
+                </table>
+                <p>Please contact your supervisor or HR department for more information.</p>
+                <p>Best regards,<br/>HR Department</p>
+            </div>
+        </field>
+    </record>
+</odoo>
