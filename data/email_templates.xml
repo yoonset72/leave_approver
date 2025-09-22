@@ -1,182 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Email template for first approval notification -->
-    <record id="email_template_first_approval" model="mail.template">
-        <field name="name">Leave Request - First Approval Required</field>
-        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-        <field name="subject">Leave Request Approval Required - ${object.employee_id.name}</field>
-        <field name="email_to">${object.first_approver_id.email or ''}</field>
-        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
-        <field name="auto_delete" eval="False"/>
-        <field name="body_html" type="html">
-            <div style="margin: 0px; padding: 0px;">
-                <p>Dear ${object.first_approver_id.name},</p>
-                <p>A leave request has been submitted and requires your approval:</p>
-                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Employee:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Reason:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.name or 'N/A'}</td>
-                    </tr>
-                </table>
-                <p>Please review and take appropriate action on this request.</p>
-                <p>
-                    <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id" 
-                       style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
-                        Review Leave Request
-                    </a>
-                </p>
-                <p>Best regards,<br/>HR Management System</p>
-            </div>
-        </field>
-    </record>
+    <data>
+        <!-- First Approval Email Template -->
+        <record id="email_template_first_approval" model="mail.template">
+            <field name="name">Leave Request - First Approval Required</field>
+            <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+            <field name="subject">Leave Request Approval Required for {{ object.employee_id.name or '' }}</field>
+            <!-- FIX: Remove company_id.email reference -->
+            <field name="email_from">smtpuser@agbcommunication.com</field>
+            <field name="email_to">{{ object.first_approver_id.email or '' }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Dear <span t-esc="object.first_approver_id.display_name or 'Approver'"/></p>
+                    <p>A leave request requires your approval:</p>
+                    <table cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; max-width: 600px; margin: 24px auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(120,90,160,0.08); overflow: hidden;">
+                        <tr style="background: linear-gradient(90deg, #875A7B 0%, #9C27B0 100%); color: #fff;">
+                            <td colspan="2" style="padding: 18px 16px; font-size: 17px; font-weight: bold; letter-spacing: 1px; border-bottom: 2px solid #f5f5fa;">
+                                Leave Request Details
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B; width: 35%;">Employee:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">ID:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.employee_number or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B; width: 35%;">Department:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.department_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Leave Type:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.holiday_status_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">From:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.request_date_from or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">To:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.request_date_to or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Duration:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.number_of_days or 0"/> day(s)
+                            </td>
+                        </tr>
+                        <t t-if="object.private_name">
+                            <tr style="background-color: #fff;">
+                                <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Description:</td>
+                                <td style="padding: 12px 14px; color: #222;">
+                                    <t t-esc="object.private_name"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                    
+                    <!-- Action Buttons Section -->
+                    <div style="text-align:center; margin-top: 24px;">
+                        <p style="margin: 12px 0 18px 0; font-size: 15px;">
+                            You can take action directly from this email:
+                        </p>
+                        
+                        <!-- Approve Button -->
+                        <p style="margin: 12px 0;">
+                            <!-- FIX: Use approval_token field -->
+                            <!-- <a t-att-href="'/leave/approve?token=%s&amp;leave_id=%s&amp;approver_id=%s&amp;level=first' % (object.approval_token, object.id, object.first_approver_id.id)"
+                                style="background: linear-gradient(90deg, #28a745 0%, #20c997 100%); padding: 12px 32px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 15px; font-weight: bold; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25); display: inline-block; margin-right: 15px;">
+                                ✓ Approve Leave
+                            </a> -->
+                        </p>
+                        
+                        <!-- View All Requests Button -->
+                        <p style="margin: 12px 0;">
+                            <!-- FIX: Use approval_token field -->
+                            <a t-att-href="'/leave/view_requests?token=%s&amp;approver_id=%s' % (object.approval_token, object.first_approver_id.id)"
+                                style="background: linear-gradient(90deg, #6f42c1 0%, #e83e8c 100%); padding: 12px 32px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 15px; font-weight: bold; box-shadow: 0 2px 8px rgba(111, 66, 193, 0.25); display: inline-block; margin-right: 15px;">
+                                📋 View All Requests
+                            </a>
+                        </p>
+                        
+                        <!-- Review in System Button -->
+                        <p style="margin: 16px 0;">
+                            <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id"
+                                style="background: linear-gradient(90deg,#875A7B 0%,#9C27B0 100%); padding: 10px 24px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 8px rgba(120,90,160,0.10); display: inline-block;">
+                                🔍 Review in System
+                            </a>
+                        </p>
+                        
+                        <p style="margin: 16px 0 0 0; font-size: 15px;">
+                            Best regards,<br/>
+                            <strong>HR System</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
 
-    <!-- Email template for second approval notification -->
-    <record id="email_template_second_approval" model="mail.template">
-        <field name="name">Leave Request - Second Approval Required</field>
-        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-        <field name="subject">Leave Request - Final Approval Required - ${object.employee_id.name}</field>
-        <field name="email_to">${ctx.get('email_to', '')}</field>
-        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
-        <field name="auto_delete" eval="False"/>
-        <field name="body_html" type="html">
-            <div style="margin: 0px; padding: 0px;">
-                <p>Dear HR Officer,</p>
-                <p>A leave request has been approved by the first level approver and now requires final approval:</p>
-                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Employee:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Department:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.employee_id.department_id.name or 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>First Approved By:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.first_approver_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Reason:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.name or 'N/A'}</td>
-                    </tr>
-                </table>
-                <p>Please review and provide final approval for this leave request.</p>
-                <p>
-                    <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id" 
-                       style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
-                        Review Leave Request
-                    </a>
-                </p>
-                <p>Best regards,<br/>HR Management System</p>
-            </div>
-        </field>
-    </record>
+        <!-- Second Approval Email Template -->
+        <record id="email_template_second_approval" model="mail.template">
+            <field name="name">Leave Request - Second Approval Required</field>
+            <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+            <field name="subject">Leave Request Final Approval Required for {{ object.employee_id.name or '' }}</field>
+            <!-- FIX: Remove company_id.email reference -->
+            <field name="email_from">${(user.email_formatted or 'smtpuser@agbcommunication.com')}</field>
+            <field name="email_to">{{ ', '.join([approver.email for approver in object.second_approver_ids if approver.email]) or '' }}</field>
+            <field name="auto_delete">False</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Dear <span t-esc="object.second_approver_id.display_name or 'Approver'"/></p>
+                    <p>A leave request requires your final approval:</p>
+                    <table cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; max-width: 600px; margin: 24px auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(120,90,160,0.08); overflow: hidden;">
+                        <tr style="background: linear-gradient(90deg, #875A7B 0%, #9C27B0 100%); color: #fff;">
+                            <td colspan="2" style="padding: 18px 16px; font-size: 17px; font-weight: bold; letter-spacing: 1px; border-bottom: 2px solid #f5f5fa;">
+                                Leave Request Details
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B; width: 35%;">Employee:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">ID:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.employee_number or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B; width: 35%;">Department:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.employee_id.department_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Leave Type:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.holiday_status_id.name or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">From:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.request_date_from or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">To:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.request_date_to or ''"/>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Duration:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <t t-esc="object.number_of_days or 0"/> day(s)
+                            </td>
+                        </tr>
+                        <t t-if="object.private_name">
+                            <tr style="background-color: #fff;">
+                                <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">Description:</td>
+                                <td style="padding: 12px 14px; color: #222;">
+                                    <t t-esc="object.private_name"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr style="background-color: #e8f5e8;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #875A7B;">First Approval:</td>
+                            <td style="padding: 12px 14px; color: #28a745; font-weight: bold;">
+                                ✓ Approved by <t t-esc="object.first_approver_id.name or 'First Approver'"/>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Action Buttons Section -->
+                    <div style="text-align:center; margin-top: 24px;">
+                        <p style="margin: 12px 0 18px 0; font-size: 15px;">
+                            You can take action directly from this email:
+                        </p>
+                        
+                        <!-- Approve Button -->
+                        <p style="margin: 12px 0;">
+                            <!-- FIX: Use approval_token field -->
+                            <!-- <a t-att-href="'/leave/approve?token=%s&amp;leave_id=%s&amp;approver_id=%s&amp;level=second' % (object.approval_token, object.id, object.second_approver_id.id)"
+                                style="background: linear-gradient(90deg, #28a745 0%, #20c997 100%); padding: 12px 32px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 15px; font-weight: bold; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25); display: inline-block; margin-right: 15px;">
+                                ✓ Final Approve
+                            </a> -->
+                        </p>
+                        
+                        <!-- View All Requests Button -->
+                        <p style="margin: 12px 0;">
+                            <!-- FIX: Use approval_token field -->
+                            <a t-att-href="'/leave/view_requests?token=%s&amp;approver_id=%s' % (object.approval_token, object.second_approver_id.id)"
+                                style="background: linear-gradient(90deg, #6f42c1 0%, #e83e8c 100%); padding: 12px 32px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 15px; font-weight: bold; box-shadow: 0 2px 8px rgba(111, 66, 193, 0.25); display: inline-block; margin-right: 15px;">
+                                📋 View All Requests
+                            </a>
+                        </p>
+                        
+                        <!-- Review in System Button -->
+                        <p style="margin: 16px 0;">
+                            <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=hr.leave' % object.id"
+                                style="background: linear-gradient(90deg,#875A7B 0%,#9C27B0 100%); padding: 10px 24px; text-decoration: none; color: #fff; border-radius: 6px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 8px rgba(120,90,160,0.10); display: inline-block;">
+                                🔍 Review in System
+                            </a>
+                        </p>
+                        
+                        <p style="margin: 16px 0 0 0; font-size: 15px;">
+                            Best regards,<br/>
+                            <strong>HR System</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
 
-    <!-- Email template for final approval notification to employee -->
-    <record id="email_template_final_approval" model="mail.template">
-        <field name="name">Leave Request - Approved</field>
-        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-        <field name="subject">Leave Request Approved - ${object.holiday_status_id.name}</field>
-        <field name="email_to">${object.employee_id.work_email or object.employee_id.personal_email}</field>
-        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
-        <field name="auto_delete" eval="False"/>
-        <field name="body_html" type="html">
-            <div style="margin: 0px; padding: 0px;">
-                <p>Dear ${object.employee_id.name},</p>
-                <p style="color: #4CAF50; font-weight: bold;">Your leave request has been approved!</p>
-                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
-                    </tr>
-                </table>
-                <p>Your leave has been fully approved and is now confirmed in the system.</p>
-                <p>Best regards,<br/>HR Department</p>
-            </div>
-        </field>
-    </record>
+        <!-- Leave Approved Notification Email Template -->
+        <record id="email_template_leave_approved" model="mail.template">
+            <field name="name">Leave Request - Approved Notification</field>
+            <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+            <field name="subject">Your Leave Request Has Been Approved</field>
+            <!-- FIX: Remove company_id.email reference -->
+            <field name="email_from">${(user.email_formatted or 'smtpuser@agbcommunication.com')}</field>
+            <field name="email_to">{{ object.employee_id.work_email or '' }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #28a745; margin: 0;">🎉 Leave Request Approved!</h2>
+                    </div>
+                    
+                    <p>Dear <span t-esc="object.employee_id.name or ''"/>,</p>
+                    <p>Great news! Your leave request has been fully approved and processed.</p>
+                    
+                    <table cellpadding="0" cellspacing="0" style="border-collapse: separate; width: 100%; max-width: 600px; margin: 24px auto; border-radius: 12px; box-shadow: 0 2px 12px rgba(40, 167, 69, 0.08); overflow: hidden;">
+                        <tr style="background: linear-gradient(90deg, #28a745 0%, #20c997 100%); color: #fff;">
+                            <td colspan="2" style="padding: 18px 16px; font-size: 17px; font-weight: bold; letter-spacing: 1px;">
+                                ✓ Approved Leave Details
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #28a745; width: 35%;">Leave Type:</td>
+                            <td style="padding: 12px 14px; color: #222;" t-esc="object.holiday_status_id.name or ''"/>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #28a745;">From:</td>
+                            <td style="padding: 12px 14px; color: #222;" t-esc="object.request_date_from or ''"/>
+                        </tr>
+                        <tr style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #28a745;">To:</td>
+                            <td style="padding: 12px 14px; color: #222;" t-esc="object.request_date_to or ''"/>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #28a745;">Duration:</td>
+                            <td style="padding: 12px 14px; color: #222;">
+                                <span t-esc="object.number_of_days or 0"/> day(s)
+                            </td>
+                        </tr>
+                        <tr t-if="object.name" style="background-color: #f8f9fa;">
+                            <td style="padding: 12px 14px; font-weight: bold; color: #28a745;">Description:</td>
+                            <td style="padding: 12px 14px; color: #222;" t-esc="object.name"/>
+                        </tr>
+                    </table>
 
-    <!-- Email template for refusal notification -->
-    <record id="email_template_refusal" model="mail.template">
-        <field name="name">Leave Request - Refused</field>
-        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-        <field name="subject">Leave Request Refused - ${object.holiday_status_id.name}</field>
-        <field name="email_to">${object.employee_id.work_email or object.employee_id.personal_email}</field>
-        <field name="email_from">${(object.env.user.email or 'noreply@company.com')}</field>
-        <field name="auto_delete" eval="False"/>
-        <field name="body_html" type="html">
-            <div style="margin: 0px; padding: 0px;">
-                <p>Dear ${object.employee_id.name},</p>
-                <p style="color: #f44336; font-weight: bold;">Your leave request has been refused.</p>
-                <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Leave Type:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.holiday_status_id.name}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Start Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_from}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>End Date:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.request_date_to}</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><strong>Duration:</strong></td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">${object.number_of_days} day(s)</td>
-                    </tr>
-                </table>
-                <p>Please contact your supervisor or HR department for more information.</p>
-                <p>Best regards,<br/>HR Department</p>
-            </div>
-        </field>
-    </record>
+                    <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 8px;">
+                        <p style="margin: 0; color: #28a745; font-weight: bold;">
+                            🌴 Enjoy your leave! We wish you a wonderful time.
+                        </p>
+                    </div>
+                    
+                    <p style="margin-top: 20px;">Best regards,<br/>
+                    <strong>HR System</strong></p>
+                </div>
+            </field>
+        </record>
+    </data>
 </odoo>

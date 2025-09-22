@@ -1,55 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_hr_leave_form_custom" model="ir.ui.view">
-        <field name="name">hr.leave.form.custom</field>
-        <field name="model">hr.leave</field>
-        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
-        <field name="arch" type="xml">
+    <data>
+        <record id="view_hr_leave_search_inherit_2step" model="ir.ui.view">
+            <field name="name">hr.leave.search.two_step_approver.filters</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    
+                    <!-- First approval: only visible to first approver -->
+                    <filter 
+                        name="my_first_approval"
+                        string="To Approve (1st level)"
+                        domain="[('state','=','confirm'), ('first_approver_id','=',uid)]"/>
 
-            <!-- Add hidden technical fields for attrs -->
-            <field name="employee_id" position="after">
-                <field name="can_approve_first" invisible="1"/>
-                <field name="can_approve_second" invisible="1"/>
+                    <!-- Second approval: only visible to designated second approvers -->
+                    <filter 
+                        name="my_second_approval"
+                        string="To Approve (2nd level)"
+                        domain="[('state','=','validate1'), ('second_approver_ids','in',[uid])]"/>
+                        
+                </xpath>
             </field>
-
-            <!-- Add approver fields -->
-            <group position="after">
-                <group string="Approval Workflow">
-                    <field name="first_approver_id" readonly="1"/>
-                    <field name="second_approver_ids" widget="many2many_tags" readonly="1"/>
-                </group>
-            </group>
-
-            <!-- Extend statusbar states -->
-            <field name="state" position="attributes">
-                <attribute name="widget">statusbar</attribute>
-                <attribute name="statusbar_visible">draft,confirm,validate1,validate,cancel,refuse</attribute>
-            </field>
-
-            <!-- Action buttons -->
-            <header position="inside">
-                <button name="action_confirm" type="object"
-                        string="Submit" states="draft"
-                        class="btn-primary"/>
-
-                <button name="action_approve" type="object"
-                        string="Approve (1st)"
-                        states="confirm"
-                        attrs="{'invisible': [('can_approve_first','=',False)]}"
-                        class="btn-success"/>
-
-                <button name="action_approve" type="object"
-                        string="Approve (2nd)"
-                        states="validate1"
-                        attrs="{'invisible': [('can_approve_second','=',False)]}"
-                        class="btn-success"/>
-
-                <button name="action_refuse" type="object"
-                        string="Refuse"
-                        states="confirm,validate1"
-                        class="btn-danger"/>
-            </header>
-
-        </field>
-    </record>
+        </record>
+    </data>
 </odoo>

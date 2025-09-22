@@ -10,13 +10,18 @@
         - Access controls based on approver assignments
         - Enhanced leave request views and menus
     """,
-    'depends': ['hr', 'hr_holidays', 'mail'],
+    'depends': ['hr', 'hr_holidays', 'mail', 'Employee_Custom'],
     'data': [
         'security/hr_leave_security.xml',
         'security/ir.model.access.csv',
         'data/email_templates.xml',
         'views/hr_leave_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'leave_approver/static/src/js/leave_notifications.js',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
