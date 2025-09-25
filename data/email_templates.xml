@@ -6,8 +6,8 @@
             <field name="name">Leave Request - First Approval Required</field>
             <field name="model_id" ref="hr_holidays.model_hr_leave"/>
             <field name="subject">Leave Request Approval Required for {{ object.employee_id.name or '' }}</field>
-            <!-- FIX: Remove company_id.email reference -->
             <field name="email_from">smtpuser@agbcommunication.com</field>
+            <field name="reply_to">hr@agbcommunication.com</field>
             <field name="email_to">{{ object.first_approver_id.email or '' }}</field>
             <field name="body_html" type="html">
                 <div>
@@ -119,6 +119,7 @@
             <field name="subject">Leave Request Final Approval Required for {{ object.employee_id.name or '' }}</field>
             <!-- FIX: Remove company_id.email reference -->
             <field name="email_from">${(user.email_formatted or 'smtpuser@agbcommunication.com')}</field>
+            <field name="reply_to">hr@agbcommunication.com</field>
             <field name="email_to">{{ ', '.join([approver.email for approver in object.second_approver_ids if approver.email]) or '' }}</field>
             <field name="auto_delete">False</field>
             <field name="body_html" type="html">
@@ -237,6 +238,7 @@
             <field name="subject">Your Leave Request Has Been Approved</field>
             <!-- FIX: Remove company_id.email reference -->
             <field name="email_from">smtpuser@agbcommunication.com</field>
+            <field name="reply_to">hr@agbcommunication.com</field>
             <field name="email_to">{{ object.employee_id.work_email or '' }}</field>
             <field name="body_html" type="html">
                 <div>
