@@ -9,12 +9,20 @@ class HrLeave(models.Model):
     _inherit = 'hr.leave'
 
     first_approver_id = fields.Many2one(
-        'res.users', string="First Approver",
-        compute='_compute_approvers', store=True, readonly=True
+        'res.users', 
+        string="First Approver",
+        compute='_compute_approvers', 
+        store=True, 
+        readonly=True
     )
     second_approver_ids = fields.Many2many(
-        'res.users', string="Second Approvers",
-        compute='_compute_approvers', store=True
+        'res.users',
+        'hr_leave_second_approver_rel',  
+        'leave_id',
+        'user_id',
+        string="Second Approvers",
+        compute='_compute_approvers', 
+        store=True
     )
     approval_token = fields.Char(string="Approval Token")
 
@@ -28,16 +36,22 @@ class HrLeave(models.Model):
             if not employee:
                 continue
 
-            # First approver = leave manager
-            if employee.leave_manager_id:
+            # First approver = manager
+            if employee.leave_manager_id and employee.leave_manager_id.active:
                 leave.first_approver_id = employee.leave_manager_id.id
 
-            # Second approvers = HR officers, excluding first approver
+            # Second approvers = hr_officer_ids (including manager if present)
             if employee.hr_officer_ids:
-                officers = employee.hr_officer_ids.filtered(lambda u: u.active)
-                if leave.first_approver_id:
-                    officers = officers.filtered(lambda u: u.id != leave.first_approver_id.id)
-                leave.second_approver_ids = [(6, 0, officers.ids)]
+                officer_ids = employee.hr_officer_ids.ids
+                leave.second_approver_ids = [(6, 0, officer_ids)]
+                _logger.info("Leave %s: Second approvers set to %s", leave.id, officer_ids)
+
+    @api.model
+    def create(self, vals):
+        record = super().create(vals)
+        record._generate_approval_token()
+        record._compute_approvers()   # 🔑 force compute after create
+        return record
 
     def action_approve(self):
         _logger.info("=== ACTION APPROVE CALLED ===")
